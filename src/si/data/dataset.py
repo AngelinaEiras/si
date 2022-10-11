@@ -126,6 +126,13 @@ class Dataset:
         }
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
 
+    def dropna (self):
+        return pd.DataFrame(self.X).dropna(axis=0).reset_index(drop=True)
+    
+    def fillna(self, value: int):
+        return pd.DataFrame(self.X).fillna(value)
+
+
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame, label: str = None):
         """
