@@ -127,9 +127,20 @@ class Dataset:
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
 
     def dropna (self):
+        """
+        Removes all the samples that have at least a "null" value (NaN).
+        Returns
+        -------
+        pandas.DataFrame (self.X).dropna(axis=0).reset_index(drop=True)
+        """
         return pd.DataFrame(self.X).dropna(axis=0).reset_index(drop=True)
     
     def fillna(self, value: int):
+        """
+        Replaces "null" values (NaN) by another value given by the user.
+        -------
+        pandas.DataFrame (self.X).fillna(value)
+        """
         return pd.DataFrame(self.X).fillna(value)
 
 
