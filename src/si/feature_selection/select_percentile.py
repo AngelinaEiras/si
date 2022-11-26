@@ -4,6 +4,8 @@ import numpy as np
 
 from si.data.dataset import Dataset
 from si.statistics.f_classification import f_classification
+# quem utilizar isto tem de fazer import da sua função, como a f_clas é usada por defeito,
+# faz se o import para estar disponível. Para se usar a f_regression fazer import desta
 
 class SelectPercentile:
     """
@@ -17,9 +19,9 @@ class SelectPercentile:
         Number of top features to select.
     """
 
-    def __init__(self, score_func: Callable = f_classification, k: int = 10, percentile: int=5):
-        self.percentil = percentile
-        self.score_func = score_func
+    def __init__(self, score_func: Callable = f_classification, percentile: float=0.5):
+        self.percentil = percentile # 50% por defeito
+        self.score_func = score_func # f_classification ou f_regression
         self.F = None
         self.p = None
     
@@ -40,7 +42,7 @@ class SelectPercentile:
         
     def transform(self, dataset: Dataset) -> Dataset:
         """
-        It transforms the dataset by selecting the k highest scoring features.
+        It transforms the dataset by selecting the features in the top percentile.
 
         Parameters
         ----------
@@ -50,16 +52,17 @@ class SelectPercentile:
         Returns
         -------
         dataset: Dataset
-            A labeled dataset with the k highest scoring features.
+            A labeled dataset with the features in the top percentile.
         """
-        idxs = np.argsort(self.F)[-self.k:]
+        k = int(len(dataset)*self.percentil) # k é o nº de features q corresponde ao percentil
+        idxs = np.argsort(self.F)[-k:] # a ordenação é em ordem crescente, por isso queremos os maiores valores q estão no fim
         features = np.array(dataset.features)[idxs]
         return range(len(features[np.percentile]))
 
 
     def fit_transform(self, dataset: Dataset) -> Dataset:
         """
-        It fits SelectKBest and transforms the dataset by selecting the k highest scoring features.
+        It fits SelectKBest and transforms the dataset by selecting the features in the top percentile.
 
         Parameters
         ----------
@@ -69,7 +72,7 @@ class SelectPercentile:
         Returns
         -------
         dataset: Dataset
-            A labeled dataset with the k highest scoring features.
+            A labeled dataset with the the features in the top percentile.
         """
         self.fit(dataset)
         return self.transform(dataset)

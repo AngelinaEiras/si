@@ -1,4 +1,4 @@
-'''from typing import Tuple, Union
+from typing import Tuple, Union
 
 import numpy as np
 from scipy import stats
@@ -23,8 +23,8 @@ def f_regression(dataset: Dataset) -> Union[Tuple[np.ndarray, np.ndarray],
     p: np.array, shape (n_features,)
         p-values
     """
-    classes = dataset.get_classes()
-    groups = [dataset.X[dataset.y == c] for c in classes]
-    F, p = stats.f_oneway(*groups)
+    grauslib = len(dataset)-2
+    pearson = [stats.pearsonr(i) for i in dataset]
+    F = [((R**2)/(1-R**2))*grauslib for R in pearson]
+    p = stats.f.sf(F,1,grauslib)
     return F, p
-'''

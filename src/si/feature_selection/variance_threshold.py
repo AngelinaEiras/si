@@ -2,6 +2,8 @@ import numpy as np
 
 from si.data.dataset import Dataset
 
+# aula 2 - se a variancia dentro daquele atributo é pequena, retira-se (ex. nº de cozinhas numa casa, vai ser praticamente 1. ou nº de sanitas numa casa de banho)
+# o threshold dita a partir de que nº há o corte
 
 class VarianceThreshold:
     """
@@ -43,6 +45,7 @@ class VarianceThreshold:
     def fit(self, dataset: Dataset) -> 'VarianceThreshold':
         """
         Fit the VarianceThreshold model according to the given training data.
+        Diz se a variancia é alta (normalmente bom) ou baixa
         Parameters
         ----------
         dataset : Dataset

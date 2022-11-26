@@ -25,7 +25,8 @@ def f_classification(dataset: Dataset) -> Union[Tuple[np.ndarray, np.ndarray],
     p: np.array, shape (n_features,)
         p-values
     """
+    # analisa a variancia recorrendo a anova ou f-values ou lá que é
     classes = dataset.get_classes()
     groups = [dataset.X[dataset.y == c] for c in classes]
     F, p = stats.f_oneway(*groups)
-    return F, p
+    return F, p # dá a destribuição F com o p-value p

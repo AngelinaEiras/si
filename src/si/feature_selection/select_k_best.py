@@ -4,6 +4,8 @@ import numpy as np
 
 from si.data.dataset import Dataset
 from si.statistics.f_classification import f_classification
+# quem utilizar isto tem de fazer import da sua função, como a f_clas é usada por defeito,
+# faz se o import para estar disponível. Para se usar a f_regression fazer import desta
 
 
 class SelectKBest:
@@ -35,8 +37,10 @@ class SelectKBest:
         ----------
         score_func: callable
             Function taking dataset and returning a pair of arrays (scores, p_values)
+            pode ser f_classification ou f_regression
         k: int, default=10
             Number of top features to select.
+            ex = SelectKBest(f_regression, 20)
         """
         self.k = k
         self.score_func = score_func
