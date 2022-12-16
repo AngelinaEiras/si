@@ -1,9 +1,10 @@
 from typing import Callable
-
+import itertools
 import numpy as np
 
 from si.data.dataset import Dataset
 from si.statistics.euclidean_distance import euclidean_distance
+from si.io.csv import read_csv
 
 
 class KMer:
@@ -19,11 +20,15 @@ class KMer:
     max_iter: int
 
     """
-    def __init__(self, k: int, seq: str):
+    def __init__(self, k: int,  alphabet = 'DNA'):
 
         # parameters
         self.k = k
-        self.seq = seq
+        if alphabet.upper() == 'DNA':
+            self.alph = 'ACTG'
+        elif alphabet.upper() == 'PROT':
+            self.alph = 'ACDEFGHIKLMNPQRSTVWY'
+        self.k_mers = None
 
 
     def fit(self):
@@ -31,22 +36,21 @@ class KMer:
         estima todos os k-mers possíveis; 
         retorna o self (ele próprio)
         '''
-        self.k_mers = [''.join(k_mer) for k_mer in intertools.products]
+        self.k_mers = [''.join(k_mer) for k_mer in itertools.products]
         return self
     
-    def transform(self):
+    def transform(self, dataset: Dataset):
         '''
         calcula a frequência normalizada de cada k-mer em cada sequência
         '''
-        sequences_k_mer_composition = [self._get_sequence_k_mer_composition(sequence)
-                                        for sequence in dataset.X[:, 0]]
+        sequences_k_mer_composition = [self._get_sequence_k_mer_composition(sequence) for sequence in dataset.X[:, 0]]
         sequences_k_mer_composition = np.array(sequences_k_mer_composition)
 
-        return Dataset(X=sequences_k_mer_composition, y=dataset.y, features=self.k_mers, label=dataset.labels)
+        return Dataset(X=sequences_k_mer_composition, y=dataset.y, features=self.k_mers, label=dataset.labels)  # create a new dataset
 
-    def fit_transform(self):
+        '''    def fit_transform(self):
         '''
-        corre o fit e depois o transform
+        '''corre o fit e depois o transform'''
         '''
         counts = {k_mer: 0 for k_mer in self.k_mers}
 
@@ -55,4 +59,10 @@ class KMer:
             counts[k_mer] +=1 
         
         #return np.array
-        return self
+        return self'''
+
+if __name__ == '__main__':
+    data1 = read_csv("D:/Mestrado/2ano/1semestre/SIB/si/datasets/tfbs/tfbs.csv", ",", True, True)
+    x = KMer(3)
+    x.fit(data1)
+    print(x.transform(data1))

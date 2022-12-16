@@ -59,6 +59,22 @@ class SelectPercentile:
         features = np.array(dataset.features)[idxs]
         return range(len(features[np.percentile]))
 
+        '''
+        def transform(self, dataset):
+            index = np.argsort(self.F)[::-1]  # ordem decrescente
+            sort_vals = np.sort(self.F)[::-1]
+            perc_vals = np.percentile(sort_vals, self.percentile)
+
+            index = index[:sum(sort_vals <= perc_vals)]
+            if dataset.features:
+                features = np.array(dataset.features)[index]
+            else:
+                features = None
+
+            return Dataset(dataset.X[:, index], dataset.Y, features, dataset.Label)
+        '''
+
+
 
     def fit_transform(self, dataset: Dataset) -> Dataset:
         """

@@ -147,7 +147,7 @@ class Dataset:
         return pd.DataFrame(self.X).dropna(axis=0).reset_index(drop=True)
     
     '''
-def drop_na(self):
+    def drop_na(self):
 
         df=pd.DataFrame(self.X, columns= self.Features)
 
