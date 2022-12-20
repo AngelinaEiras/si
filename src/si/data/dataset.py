@@ -140,36 +140,10 @@ class Dataset:
     def dropna (self):
         """
         Removes all the samples that have at least a "null" value (NaN).
-        Returns
-        -------
-        pandas.DataFrame (self.X).dropna(axis=0).reset_index(drop=True)
         """
-        return pd.DataFrame(self.X).dropna(axis=0).reset_index(drop=True)
-    
-    '''
-    def drop_na(self):
-
-        df=pd.DataFrame(self.X, columns= self.Features)
-
-        if not (self.Y is None):
-            df.insert(loc=len(df), column=self.Label, value=self.Y)
-
-            dfn=df.dropna()
-            dt=dfn.to_numpy()
-
-            if dt is not None:
-                self.Y=[]
-                for elem in dt[0:, -1:]:
-                    self.Y.append(float(elem))
-                self.X = dt[0:,:-1]
-        else:
-            dfn = df.dropna()
-            dt = dfn.to_numpy()
-            self.Y=[]
-            self.X = dt[0:, :]
-
-        return Dataset(self.X, self.Y, self.Features, self.Label)
-    '''
+        dataset = self.to_dataframe()
+        dataset.dropna(axis=0).reset_index(drop=True)
+        return self.from_dataframe(dataset,self.label)
 
     def fillna(self, value: int):
         """
@@ -177,32 +151,10 @@ class Dataset:
         -------
         pandas.DataFrame (self.X).fillna(value)
         """
-        return pd.DataFrame(self.X).fillna(value)
+        dataset = self.to_dataframe()
+        dataset.fillna(axis=0)
+        return self.from_dataframe(dataset,self.label)
 
-    '''
-    def fill_Na(self, n_or_m):
-        df = pd.DataFrame(self.X, columns=self.Features)
-        if not (self.Y is None):
-            df.insert(loc=len(df), column=self.Label, value=self.Y)
-
-            fill_df=df.fillna(n_or_m)
-            dt = fill_df.to_numpy()
-
-            if dt is not None:
-                self.Y = []
-                for elem in dt[0:, -1:]:
-                    self.Y.append(float(elem))
-
-                self.X = dt[0:, :-1]
-        else:
-            dfn = df.dropna()
-            dt = dfn.to_numpy()
-            self.Y=[]
-            self.X = dt[0:, :]
-
-
-        return Dataset(self.X, self.Y, self.Features, self.Label)
-    '''
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame, label: str = None):
@@ -277,16 +229,3 @@ class Dataset:
         return cls(X, y, features=features, label=label)
 
 
-'''
-if __name__ == '__main__':
-    import si.io.CSV as CSV
-    temp = CSV.read_csv('D:/Mestrado/2ano/1semestre/SIB/si/datasets/iris.csv', ',', True)
-
-    x=np.array([[np.nan,1,3], [3,2,3], [3,np.nan,3]])
-    y=np.array([1,2,5])
-    features= ['A', 'B','C']        
-    label= 'y'
-    dataset= Dataset(X=x, y=None, features= features, label=None)
-    # print(dataset.get_var())
-    print(temp.fill_Na(0))
-'''
