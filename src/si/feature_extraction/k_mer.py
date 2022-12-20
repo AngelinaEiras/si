@@ -33,8 +33,7 @@ class KMer:
 
     def fit(self):
         '''
-        estima todos os k-mers possíveis; 
-        retorna o self (ele próprio)
+        estima todos os k-mers possíveis
         '''
         self.k_mers = [''.join(k_mer) for k_mer in itertools.products]
         return self
@@ -48,10 +47,10 @@ class KMer:
 
         return Dataset(X=sequences_k_mer_composition, y=dataset.y, features=self.k_mers, label=dataset.labels)  # create a new dataset
 
-        '''    def fit_transform(self):
-        '''
+    def fit_transform(self):
+
         '''corre o fit e depois o transform'''
-        '''
+
         counts = {k_mer: 0 for k_mer in self.k_mers}
 
         for i in range(len(seq)-self.k +1):
@@ -59,10 +58,10 @@ class KMer:
             counts[k_mer] +=1 
         
         #return np.array
-        return self'''
+        return self
 
 if __name__ == '__main__':
-    data1 = read_csv("D:/Mestrado/2ano/1semestre/SIB/si/datasets/tfbs/tfbs.csv", ",", True, True)
+    data1 = read_csv("/home/angelina/Desktop/2ano/si/datasets/tfbs.csv", ",", True, True)
     x = KMer(3)
     x.fit(data1)
     print(x.transform(data1))
