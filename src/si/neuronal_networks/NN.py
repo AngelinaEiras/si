@@ -1,64 +1,164 @@
-from si.data.dataset import Dataset
-import numpy as np
-from si.metrics import mse
 from typing import Callable
 
-class NN: # NeuroNetwork
-    def __ini__(self, layers):
-        self.layers= layers
-    
-    def fit(self, dataset):
-        y = dataset.x
-        for layer in self.layers:
-            x = layer.forward(x)
+import numpy as np
+
+from si.data.dataset import Dataset
+from si.metrics.accuracy import accuracy
+from si.metrics.mse import mse, mse_derivative
 
 
-'''
 class NN:
+    """
+    The NN is the Neural Network model.
+    It comprehends the model topology including several neural network layers.
+    The algorithm for fitting the model is based on backpropagation.
+    Parameters
+    ----------
+    layers: list
+        List of layers in the neural network.
+    epochs: int
+        Number of epochs to train the model.
+    learning_rate: float
+        The learning rate of the model.
+    loss: Callable
+        The loss function to use.
+    loss_derivative: Callable
+        The derivative of the loss function to use.
+    verbose: bool
+        Whether to print the loss at each epoch.
+    Attributes
+    ----------
+    history: dict
+        The history of the model training.
+    """
 
-    def __init__(self, layers=None, epochs = 1000,learning_rate: float = 0.01, loss_fun: Callable = mse,
-                 loss_derivate: Callable = mse_derivate, verbose: bool = False ):
-        if layers is None:
-            layers = []
+    def __init__(self,
+                 layers: list,
+                 epochs: int = 1000,
+                 learning_rate: float = 0.01,
+                 loss: Callable = mse,
+                 loss_derivative: Callable = mse_derivative,
+                 verbose: bool = False):
+        """
+        Initialize the neural network model.
+        Parameters
+        ----------
+        layers: list
+            List of layers in the neural network.
+        epochs: int
+            Number of epochs to train the model.
+        learning_rate: float
+            The learning rate of the model.
+        loss: Callable
+            The loss function to use.
+        loss_derivative: Callable
+            The derivative of the loss function to use.
+        verbose: bool
+            Whether to print the loss at each epoch.
+        """
+        # parameters
         self.layers = layers
         self.epochs = epochs
-        self.loss_fun = loss_fun
         self.learning_rate = learning_rate
-        self.loss_derivate = loss_derivate
+        self.loss = loss
+        self.loss_derivative = loss_derivative
         self.verbose = verbose
 
-        self.history={}
+        # attributes
+        self.history = {}
 
     def fit(self, dataset: Dataset) -> 'NN':
+        """
+        It fits the model to the given dataset.
+        Parameters
+        ----------
+        dataset: Dataset
+            The dataset to fit the model to
+        Returns
+        -------
+        self: NN
+            The fitted model
+        """
 
-        X = dataset.X
-        Y = dataset.Y
-
-        for epoch in range(1,  self.epochs + 1):
-
+        for epoch in range(1, self.epochs + 1):
+            X = dataset.X
+            y = dataset.y
+            #print("Epoch:",epoch)
+            # forward propagation
             for layer in self.layers:
                 X = layer.forward(X)
-
-            error = self.loss_derivate(Y,X)
+                #print(X.shape)
+            #print("with y.shape as ",y.shape, "and X.shape as", X.shape)
+            # backward propagation
+            error = self.loss_derivative(y, X)
+            #print("error shape:", error.shape)
             for layer in self.layers[::-1]:
-                error= layer.backward(error, self.learning_rate)
+                #print("Error layer backpropagation:",self.layers.index(layer))
+                error : np.ndarray = layer.backward(error, self.learning_rate)
+                #print("error transformed to", error.shape)
 
-            cost= self.loss_fun(Y, X)
-            self.history[epoch]=cost
+            # save history
+            cost = self.loss(y, X)
+            self.history[epoch] = cost
 
+            # print loss
             if self.verbose:
                 print(f'Epoch {epoch}/{self.epochs} - cost: {cost}')
 
         return self
 
     def predict(self, dataset: Dataset) -> np.ndarray:
+        """
+        It predicts the output of the given dataset.
+        Parameters
+        ----------
+        dataset: Dataset
+            The dataset to predict the output of
+        Returns
+        -------
+        predictions: np.ndarray
+            The predicted output
+        """
+        X = dataset.X.copy()
 
-        X = dataset.X
-
+        # forward propagation
         for layer in self.layers:
             X = layer.forward(X)
 
         return X
 
-    def cost(self, ):
-'''
+    def cost(self, dataset: Dataset) -> float:
+        """
+        It computes the cost of the model on the given dataset.
+        Parameters
+        ----------
+        dataset: Dataset
+            The dataset to compute the cost on
+        Returns
+        -------
+        cost: float
+            The cost of the model
+        """
+        y_pred = self.predict(dataset)
+        return self.loss(dataset.y, y_pred)
+
+    def score(self, dataset: Dataset, scoring_func: Callable = accuracy) -> float:
+        """
+        It computes the score of the model on the given dataset.
+        Parameters
+        ----------
+        dataset: Dataset
+            The dataset to compute the score on
+        scoring_func: Callable
+            The scoring function to use
+        Returns
+        -------
+        score: float
+            The score of the model
+        """
+        y_pred = self.predict(dataset)
+        return scoring_func(dataset.y, y_pred)
+
+
+if __name__ == '__main__':
+    pass

@@ -1,23 +1,19 @@
+from sklearn.preprocessing import StandardScaler
 import numpy as np
 import matplotlib
-
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-
-from si.data.dataset import Dataset
-from si.metrics.mse import mse
-from si.statistics.sigmoid_function import sigmoid_function
 from si.metrics.accuracy import accuracy
-
-
+from si.statistics.sigmoid_function import sigmoid_function
+from si.data.dataset import Dataset
+#from si.metrics.mse import mse
+matplotlib.use('TkAgg')
 
 
 class LogisticRegression:
 
     def __init__(self, use_adaptive_alpha: bool = False, l2_penalty: float = 1, alpha: float = 0.001, max_iter: int = 1000) -> None:
 
-    # parameters
+        # parameters
         self.l2_penalty = l2_penalty
         self.alpha = alpha
         self.max_iter = max_iter
@@ -29,31 +25,8 @@ class LogisticRegression:
         self.history = {}
     
     def fit(self, dataset: Dataset) -> 'LogisticRegression':
+        return self._regular_fit(dataset)
 
-        m, n = dataset.shape()
-
-        # initialize the model parameters
-        self.theta = np.zeros(n)
-        self.theta_zero = 0
-
-        # gradient descent
-        for i in range(self.max_iter):
-            # predicted y
-            y_pred = np.dot(dataset.X, self.theta) + self.theta_zero
-
-            # computing and updating the gradient with the learning rate
-            gradient = (self.alpha * (1 / m)) * np.dot(y_pred - dataset.y, dataset.X)
-
-            # computing the penalty
-            penalization_term = self.alpha * (self.l2_penalty / m) * self.theta
-
-            # updating the model parameters
-            self.theta = self.theta - gradient - penalization_term
-            self.theta_zero = self.theta_zero - (self.alpha * (1 / m)) * np.sum(y_pred - dataset.y)
-
-        return self
-
-        '''
     def _regular_fit(self, dataset: Dataset) -> 'LogisticRegression':
         """
         Fit the model to the dataset
@@ -75,10 +48,12 @@ class LogisticRegression:
         # gradient descent
         for i in range(self.max_iter):
             # predicted y
-            y_pred = sigmoid_function(np.dot(dataset.X, self.theta) + self.theta_zero)
+            y_pred = sigmoid_function(
+                np.dot(dataset.X, self.theta) + self.theta_zero)
 
             # computing and updating the gradient with the learning rate
-            gradient = (self.alpha * (1 / m)) * np.dot(y_pred - dataset.Y, dataset.X)
+            gradient = (self.alpha * (1 / m)) * \
+                np.dot(y_pred - dataset.y, dataset.X)
 
             # computing the penalty
             penalization_term = self.alpha * (self.l2_penalty / m) * self.theta
@@ -95,7 +70,8 @@ class LogisticRegression:
                     self.history[i] = custo
                 else:
                     break
-            self.theta_zero = self.theta_zero - (self.alpha * (1 / m)) * np.sum(y_pred - dataset.Y)
+            self.theta_zero = self.theta_zero - \
+                (self.alpha * (1 / m)) * np.sum(y_pred - dataset.y)
             # self.history[i] = custo
 
         return self
@@ -123,17 +99,20 @@ class LogisticRegression:
         for i in range(self.max_iter):
 
             # predicted y
-            y_pred = sigmoid_function(np.dot(dataset.X, self.theta) + self.theta_zero)
+            y_pred = sigmoid_function(
+                np.dot(dataset.X, self.theta) + self.theta_zero)
 
             # computing and updating the gradient with the learning rate
-            gradient = (self.alpha * (1 / m)) * np.dot(y_pred - dataset.Y, dataset.X)
+            gradient = (self.alpha * (1 / m)) * \
+                np.dot(y_pred - dataset.y, dataset.X)
 
             # computing the penalty
             penalization_term = self.alpha * (self.l2_penalty / m) * self.theta
 
             # updating the model parameters
             self.theta = self.theta - gradient - penalization_term
-            self.theta_zero = self.theta_zero - (self.alpha * (1 / m)) * np.sum(y_pred - dataset.Y)
+            self.theta_zero = self.theta_zero - \
+                (self.alpha * (1 / m)) * np.sum(y_pred - dataset.y)
 
             # custo
             custo = self.cost(dataset)
@@ -157,12 +136,10 @@ class LogisticRegression:
         return self
 
     def line_plot(self):
-
-        it = list(self.history.keys())  # list() needed for python 3.x
-        custo = list(self.history.values())  # ditto
-        plt.plot(it, custo, '-')
-
-        return plt.show()
+        iterations = list(self.history.keys())
+        costs = list(self.history.values())
+        plt.plot(iterations, costs)
+        plt.show()
 
     def predict(self, dataset: Dataset) -> np.array:
         """
@@ -177,7 +154,8 @@ class LogisticRegression:
             The predictions of the dataset
         """
 
-        values = sigmoid_function(np.dot(dataset.X, self.theta) + self.theta_zero)
+        values = sigmoid_function(
+            np.dot(dataset.X, self.theta) + self.theta_zero)
         arr = []
 
         for i in values:
@@ -199,8 +177,8 @@ class LogisticRegression:
         accuracy: float
             The Mean Square Error of the model
         """
-        y_pred_ = self.predict(dataset)
-        return accuracy(dataset.Y, y_pred_)
+        y_pred = self.predict(dataset)
+        return accuracy(dataset.y, y_pred)
 
     def cost(self, dataset: Dataset) -> float:
         """
@@ -214,44 +192,38 @@ class LogisticRegression:
         cost: float
             The cost function of the model
         """
-        prediction = sigmoid_function(np.dot(dataset.X, self.theta) + self.theta_zero)
-        cost = (-dataset.Y * np.log(prediction)) - ((1 - dataset.Y) * np.log(1 - prediction))
+        prediction = sigmoid_function(
+            np.dot(dataset.X, self.theta) + self.theta_zero)
+        cost = (-dataset.y * np.log(prediction)) - \
+            ((1 - dataset.y) * np.log(1 - prediction))
         cost = np.sum(cost) / dataset.shape()[0]
-        cost = cost + (self.l2_penalty * np.sum(self.theta ** 2) / (2 * dataset.shape()[0]))
+        cost = cost + (self.l2_penalty * np.sum(self.theta **
+                       2) / (2 * dataset.shape()[0]))
         return cost
 
 
 if __name__ == '__main__':
-    import dataset
-    from si.model_selection.split import train_test_split
-    from si.io.CSV import read_csv
-    from sklearn.preprocessing import StandardScaler
 
-    data1 = read_csv("D:/Mestrado/2ano/1semestre/SIB/si/datasets/breast/breast-bin.data", ",", False, True)
+    from si.model_selection.split import train_test_split
+    from si.io.csv import read_csv
+    import os
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, '../../../datasets/breast-bin.data')
+    data1 = read_csv(filename, ",", False, True)
 
     # fit the model
     data1.X = StandardScaler().fit_transform(data1.X)
     train, test = train_test_split(data1, 0.3, 2)
     model = LogisticRegression()
-    model.fit(train)
-    # model.line_plot()
+    model._regular_fit(train)
+    score = model.score(data1)
+    cost = model.cost(data1)
+    pred = model.predict(data1)
+    model.line_plot()
     print(model.history)
-
-    # # get coefs
-    # print(f"Parameters: {model.theta}")
-    #
-    # # compute the score
-    # score = model.score(data1)
-    # print(f"Score: {score}")
-
-    # compute the cost
-    # cost = model.cost(dataset_)
-    # print(f"Cost: {cost}")
-
-    # predict
-    # y_pred_ = model.predict(data1)
-    # print()
-    # print(f"Predictions: {y_pred_}")
-    # print('\nScore:',model.score(data1) )
-    # print('\nCost:', model.cost(data1))
-        '''
+    print(f"Parameters: {model.theta}")
+    print(f"Score: {score}")
+    print(f"Cost: {cost}")
+    print(f"Predictions: {pred}")
+    print(f"Score: {model.score(data1)}")
+    print(f"Cost: {model.cost(data1)}")

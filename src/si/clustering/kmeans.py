@@ -28,6 +28,7 @@ class KMeans:
     labels: np.array
         Labels of the clusters.
     """
+    
     def __init__(self, k: int, max_iter: int = 1000, distance: Callable = euclidean_distance):
         """
         K-means clustering algorithm.
@@ -106,7 +107,8 @@ class KMeans:
         while not convergence and i < self.max_iter:
 
             # get closest centroid
-            new_labels = np.apply_along_axis(self._get_closest_centroid, axis=1, arr=dataset.X)
+            new_labels = np.apply_along_axis(
+                self._get_closest_centroid, axis=1, arr=dataset.X)
 
             # compute the new centroids
             centroids = []
@@ -159,7 +161,8 @@ class KMeans:
         np.ndarray
             Transformed dataset.
         """
-        centroids_distances = np.apply_along_axis(self._get_distances, axis=1, arr=dataset.X)
+        centroids_distances = np.apply_along_axis(
+            self._get_distances, axis=1, arr=dataset.X)
         return centroids_distances
 
     def fit_transform(self, dataset: Dataset) -> np.ndarray:
@@ -214,11 +217,9 @@ class KMeans:
 
 
 if __name__ == '__main__':
-    from si.data.dataset import Dataset
     dataset_ = Dataset.from_random(100, 5)
-
-    k_ = 3
-    kmeans = KMeans(k_)
+    K = 3
+    kmeans = KMeans(K)
     res = kmeans.fit_transform(dataset_)
     predictions = kmeans.predict(dataset_)
     print(res.shape)

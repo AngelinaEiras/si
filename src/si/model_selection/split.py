@@ -1,54 +1,62 @@
+from typing import Tuple
+
 import numpy as np
-import random as rd
-import typing
+
 from si.data.dataset import Dataset
 
 
-def train_test_split(dset : Dataset, test_size : float, random_state):
-    rd.seed(random_state)
-    n_samples = dset.shape()[0]
-    permutacoes = np.random.permutation(n_samples)
-    corte = int(n_samples*test_size)
-    sample_index_train = permutacoes[corte:]
-    sample_index_test = permutacoes[:corte]
-    
-    df = dset.to_dataframe
-    dt_train = Dataset(df.iloc[sample_index_train], features=dset.features, label=dset.label)
-    dt_test = Dataset(df.iloc[sample_index_test], features=dset.features, label=dset.label)
-    return (dt_train, dt_test)
-
-'''
-
-def train_test_split(dataset, test_size, random_state):
+def train_test_split(dataset: Dataset, test_size: float = 0.2, random_state: int = 42) -> Tuple[Dataset, Dataset]:
+    """
+    Split the dataset into training and testing sets
+    Parameters
+    ----------
+    dataset: Dataset
+        The dataset to split
+    test_size: float
+        The proportion of the dataset to include in the test split
+    random_state: int
+        The seed of the random number generator
+    Returns
+    -------
+    train: Dataset
+        The training dataset
+    test: Dataset
+        The testing dataset
+    """
+    # set random state
     np.random.seed(random_state)
 
-    n_samples= dataset.shape()[0]
+    # get dataset size
+    n_samples = dataset.shape()[0]
 
-    n_test= int(n_samples * test_size)
+    # get number of samples in the test set
+    n_test = int(n_samples * test_size)
 
+    # get the dataset permutations
     permutations = np.random.permutation(n_samples)
 
-    test_indx = permutations[:n_test]
+    # get samples in the test set
+    test_idxs = permutations[:n_test]
 
-    train_indx = permutations[n_test:]
+    # get samples in the training set
+    train_idxs = permutations[n_test:]
 
-
-    train = Dataset(dataset.X[train_indx], dataset.Y[train_indx], features = dataset.Features, label=dataset.Label)
-    test = Dataset(dataset.X[test_indx], dataset.Y[test_indx], features = dataset.Features, label=dataset.Label)
-
+    # get the training and testing datasets
+    train = Dataset(dataset.X[train_idxs], dataset.y[train_idxs], features=dataset.features, label=dataset.label)
+    test = Dataset(dataset.X[test_idxs], dataset.y[test_idxs], features=dataset.features, label=dataset.label)
     return train, test
-'''
 
 
 if __name__ == '__main__':
     import si.io.csv as CSV
-    temp = CSV.read_csv('D:/Mestrado/2ano/1semestre/SIB/si/datasets/iris.csv', ',', True)
-
-    x=np.array([[np.nan,1,3], [3,2,3], [3,np.nan,3]])
-    y=np.array([1,2,5])
-    features= ['A', 'B','C']        
-    label= 'y'
-    dataset= Dataset(X=x, y=None, features= features, label=None)
+    import os
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, '../../../datasets/iris.csv')
+    temp = CSV.read_csv(filename, sep=',', features=True)
+    #temp = CSV.read_csv('D:/Mestrado/2ano/1semestre/SIB/si/datasets/iris.csv', ',', True)
+    x = np.array([[np.nan, 1, 3], [3, 2, 3], [3, np.nan, 3]])
+    y = np.array([1, 2, 5])
+    features = ['A', 'B', 'C']; label = 'y'
+    dataset = Dataset(X=x, y=y, features=features, label=label)
     # print(dataset.get_var())
-    print(temp.fill_Na(0))
     print(train_test_split(dataset, 0.2, 5))

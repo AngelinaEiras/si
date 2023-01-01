@@ -7,6 +7,7 @@ from si.statistics.f_classification import f_classification
 # quem utilizar isto tem de fazer import da sua função, como a f_clas é usada por defeito,
 # faz se o import para estar disponível. Para se usar a f_regression fazer import desta
 
+
 class SelectPercentile:
     """
     Select features according to the k highest scores.
@@ -19,7 +20,7 @@ class SelectPercentile:
         Number of top features to select.
     """
 
-    def __init__(self, score_func: Callable = f_classification, percentile: float=0.5):
+    def __init__(self, score_func: Callable = f_classification, percentile: float = 0.5):
         self.percentil = percentile # 50% por defeito
         self.score_func = score_func # f_classification ou f_regression
         self.F = None
@@ -54,27 +55,12 @@ class SelectPercentile:
         dataset: Dataset
             A labeled dataset with the features in the top percentile.
         """
-        k = int(len(dataset)*self.percentil) # k é o nº de features q corresponde ao percentil
-        idxs = np.argsort(self.F)[-k:] # a ordenação é em ordem crescente, por isso queremos os maiores valores q estão no fim
+        # nº de features q corresponde ao percentil
+        k = int(len(dataset) * self.percentil)
+        # ordem crescente
+        idxs = np.argsort(self.F)[-k:]
         features = np.array(dataset.features)[idxs]
         return range(len(features[np.percentile]))
-
-        '''
-        def transform(self, dataset):
-            index = np.argsort(self.F)[::-1]  # ordem decrescente
-            sort_vals = np.sort(self.F)[::-1]
-            perc_vals = np.percentile(sort_vals, self.percentile)
-
-            index = index[:sum(sort_vals <= perc_vals)]
-            if dataset.features:
-                features = np.array(dataset.features)[index]
-            else:
-                features = None
-
-            return Dataset(dataset.X[:, index], dataset.Y, features, dataset.Label)
-        '''
-
-
 
     def fit_transform(self, dataset: Dataset) -> Dataset:
         """
@@ -92,6 +78,3 @@ class SelectPercentile:
         """
         self.fit(dataset)
         return self.transform(dataset)
-
-
-

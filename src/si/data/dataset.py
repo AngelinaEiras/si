@@ -37,14 +37,15 @@ class Dataset:
         self.label = label
 
     def __str__(self):
-        if not (self.Features is None):
-            r=f'X:{str(self.Features)[:]}\n--\n'
+        if not (self.features is None):
+            r = f'X:{str(self.features)[:]}\n--\n'
         else:
             r = 'X:\n--\n'
         for elem in self.X:
-            r += str(elem)[:].replace(' ', '\t') +'\n'
-        if not (self.Y is None):
-            r+= f'\nY: {self.Label}\n--\n' + str(self.Y).replace(' ', '\t') +'\n'
+            r += str(elem)[:].replace(' ', '\t') + '\n'
+        if not (self.y is None):
+            r += f'\nY: {self.label}\n--\n' + \
+                str(self.y).replace(' ', '\t') + '\n'
         return r
 
     def shape(self) -> Tuple[int, int]:
@@ -143,7 +144,7 @@ class Dataset:
         """
         dataset = self.to_dataframe()
         dataset.dropna(axis=0).reset_index(drop=True)
-        return self.from_dataframe(dataset,self.label)
+        return self.from_dataframe(dataset, self.label)
 
     def fillna(self, value: int):
         """
@@ -152,9 +153,8 @@ class Dataset:
         pandas.DataFrame (self.X).fillna(value)
         """
         dataset = self.to_dataframe()
-        dataset.fillna(axis=0)
-        return self.from_dataframe(dataset,self.label)
-
+        dataset.fillna(value, axis=0)
+        return self.from_dataframe(dataset, self.label)
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame, label: str = None):
@@ -227,5 +227,3 @@ class Dataset:
         X = np.random.rand(n_samples, n_features)
         y = np.random.randint(0, n_classes, n_samples)
         return cls(X, y, features=features, label=label)
-
-

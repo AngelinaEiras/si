@@ -2,8 +2,6 @@ import numpy as np
 
 from si.data.dataset import Dataset
 
-# aula 2 - se a variancia dentro daquele atributo é pequena, retira-se (ex. nº de cozinhas numa casa, vai ser praticamente 1. ou nº de sanitas numa casa de banho)
-# o threshold dita a partir de que nº há o corte
 
 class VarianceThreshold:
     """
@@ -76,17 +74,6 @@ class VarianceThreshold:
         features = np.array(dataset.features)[features_mask]
         return Dataset(X=X, y=dataset.y, features=list(features), label=dataset.label)
 
-    '''
-    def transform(self, dataset):
-        mask = self.variance > self.threshold
-        new_X = dataset.X[:, mask]
-
-        if not (dataset.Features is None):
-            dataset.Features = [elem for ix, elem in enumerate(dataset.Features) if mask[ix]]
-
-        return Dataset(new_X, dataset.Y, dataset.Features, dataset.Label)
-    '''
-
     def fit_transform(self, dataset: Dataset) -> Dataset:
         """
         Fit to data, then transform it.
@@ -103,29 +90,14 @@ class VarianceThreshold:
 
 
 if __name__ == '__main__':
-    from si.data.dataset import Dataset
-
-    dataset = Dataset(X=np.array([[0, 2, 0, 3],
-                                  [0, 1, 4, 3],
-                                  [0, 1, 1, 3]]),
-                      y=np.array([0, 1, 0]),
-                      features=["f1", "f2", "f3", "f4"],
-                      label="y")
+    dataset_example = Dataset(X=np.array([[0, 2, 0, 3],
+                                          [0, 1, 4, 3],
+                                          [0, 1, 1, 3]]),
+                              y=np.array([0, 1, 0]),
+                              features=["f1", "f2", "f3", "f4"],
+                              label="y")
 
     selector = VarianceThreshold()
-    selector = selector.fit(dataset)
-    dataset = selector.transform(dataset)
-    print(dataset.features)
-
-'''
-if __name__ == '__main__':
-    from si.io.CSV import read_csv
-    # make a linear dataset
-    data0 = read_csv('D:/Mestrado/2ano/1semestre/SIB/si/datasets/cpu/cpu.csv', sep=",", label=True)
-
-    # fit the model
-    model = VarianceThreshold(3)
-    print(data0.X)
-    fit=(model.fit(data0))
-    print(model.transform(fit))
-'''
+    selector = selector.fit(dataset_example)
+    dataset_example = selector.transform(dataset_example)
+    print(dataset_example.features)
