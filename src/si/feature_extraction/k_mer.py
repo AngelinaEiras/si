@@ -36,7 +36,7 @@ class KMer:
         :param dataset: An instance of the Dataset class (required for consistency purposes only)
         """
         self.k_mers = ["".join(kmer) for kmer in itertools.product(
-            self.alpha, repeat=self.k)]
+            self.alph, repeat=self.k)]
         return self
     
     def _get_sequence_k_mer_composition(self, sequence: str) -> np.ndarray:

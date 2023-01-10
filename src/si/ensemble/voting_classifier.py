@@ -44,6 +44,8 @@ class VotingClassifier:
         accuracy: float
             The Mean Square Error of the model
         """
+        print(self.predict(dataset))
+        print(dataset.y)
         mse = accuracy(dataset.y, self.predict(dataset))
         return mse
 
